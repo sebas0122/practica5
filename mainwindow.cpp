@@ -153,6 +153,26 @@ MainWindow::~MainWindow()
 
 void MainWindow::animar()
 {
+    for (QGraphicsRectItem* azulItem : paredes) {
+        if (circle->collidesWithItem(azulItem)) {
+            if (circle->y() + circle->rect().height() > azulItem->y() && moverUy1) {
+                // La pared está arriba, se evita el movimiento hacia arriba
+                moverUy1 = false;
+            }
+            if (circle->y() < azulItem->y() + azulItem->rect().height() && moverDy1) {
+                // La pared está abajo, se evita el movimiento hacia abajo
+                moverDy1 = false;
+            }
+            if (circle->x() + circle->rect().width() > azulItem->x() && moverIx1) {
+                // La pared está a la izquierda, se evita el movimiento hacia la izquierda
+                moverIx1 = false;
+            }
+            if (circle->x() < azulItem->x() + azulItem->rect().width() && moverDx1) {
+                // La pared está a la derecha, se evita el movimiento hacia la derecha
+                moverDx1 = false;
+            }
+        }
+    }
     if(moverIx1)
     {
         circle->setPos(circle->x()-30,circle->y());
@@ -169,33 +189,8 @@ void MainWindow::animar()
     {
         circle->setPos(circle->x(),circle->y()+30);
     }
-    for (QGraphicsRectItem* azulItem : paredes) {
-                if(circle->collidesWithItem(azulItem))
-                {
-                    if (circle->y()  <= azulItem->y() && moverUy1==true)
-                    {
-                        // La pared está arriba, se evita el movimiento hacia arriba
-                        moverUy1 = false;
-                    }
-                    if (circle->y() >= azulItem->y() && moverDy1==true)
-                    {
-                        // La pared está abajo, se evita el movimiento hacia abajo
-                        moverDy1 = false;
-                    }
-                    if (circle->x() <= azulItem->x() && moverIx1==true)
-                    {
-                        // La pared está a la izquierda, se evita el movimiento hacia la izquierda
-                        moverIx1 = false;
-                    }
-                    if (circle->x() >= azulItem->x() && moverDx1==true)
-                    {
-                        // La pared está a la derecha, se evita el movimiento hacia la derecha
-                        moverDx1 = false;
-                    }
-                }
-    }
-    for (QGraphicsRectItem* amarilloItem : galletas)
-        if(circle->collidesWithItem(amarilloItem))
+    for (QGraphicsRectItem* amarilloItem : galletas){
+       if(circle->collidesWithItem(amarilloItem))
         {
             if(amarilloItem->isVisible()){
                 amarilloItem->hide();
@@ -204,6 +199,7 @@ void MainWindow::animar()
             }
 
         }
+    }
 }
 
 void MainWindow::keyPressEvent(QKeyEvent *ev)
@@ -214,11 +210,11 @@ void MainWindow::keyPressEvent(QKeyEvent *ev)
     }
     else if(ev->key()==Qt::Key_S)
     {
-        moverDx1=true;
+        moverDx1 = true;
     }
     else if(ev->key()==Qt::Key_W)
     {
-        moverUy1=true;
+       moverUy1=true;
     }
     else if(ev->key()==Qt::Key_Z)
     {
