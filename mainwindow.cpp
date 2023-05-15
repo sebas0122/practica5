@@ -137,8 +137,8 @@ MainWindow::MainWindow(QWidget *parent)
             else if(tablero[i][j]==3){
                 int x = j * matrizx;
                 int y = i * matrizy;
-                circle = new QGraphicsEllipseItem(x, y, matrizx, matrizy);
-                circle->setRect(x, y, matrizx, matrizy);
+                circle = new QGraphicsEllipseItem(x, y, matrizx-10, matrizy-10);
+                circle->setRect(x, y, matrizx-10, matrizy-10);
                 circle->setBrush(Qt::yellow);
                 scene->addItem(circle);
             }
@@ -153,41 +153,61 @@ MainWindow::~MainWindow()
 
 void MainWindow::animar()
 {
+    int disxD=0;
+    int disxI=0;
+    int disyA=0;
+    int disyB=0;
     for (QGraphicsRectItem* azulItem : paredes) {
-        if (circle->collidesWithItem(azulItem)) {
-            if (circle->y() < azulItem->y()) {
-                // La pared está arriba, se evita el movimiento hacia arriba
-                moverUy1 = false;
-            }
-            if (circle->y() > azulItem->y()) {
-                // La pared está abajo, se evita el movimiento hacia abajo
-                moverDy1 = false;
-            }
-            if (circle->x() > azulItem->x()) {
-                // La pared está a la izquierda, se evita el movimiento hacia la izquierda
-                moverIx1 = false;
-            }
-            if (circle->x() < azulItem->x()) {
-                // La pared está a la derecha, se evita el movimiento hacia la derecha
-                moverDx1 = false;
-            }
+        if (circle->collidesWithItem(azulItem) && circle->y() < azulItem->y()) {
+            // La pared está arriba, se evita el movimiento hacia arriba
+            moverUy1 = false;
+            disyA=azulItem->y()-circle->y();
         }
+        if (circle->collidesWithItem(azulItem) && circle->y() > azulItem->y()) {
+            // La pared está abajo, se evita el movimiento hacia abajo
+            moverDy1 = false;
+            disyB=circle->y()-azulItem->y();
+        }
+        else if (circle->collidesWithItem(azulItem) && circle->x() > azulItem->x()) {
+            // La pared está a la izquierda, se evita el movimiento hacia la izquierda
+            moverIx1 = false;
+            disxD=circle->x() - azulItem->x();
+        }
+        else if (circle->collidesWithItem(azulItem) && circle->x() < azulItem->x()) {
+            // La pared está a la derecha, se evita el movimiento hacia la derecha
+            moverDx1 = false;
+            disxI=azulItem->x()-circle->x();
+        }
+        if (disxI>disxD && disxI>disyA && disxI>disyB){
+            circle->setPos(circle->x()+1,circle->y());
+        }
+        else if (disxD>disxI && disxD>disyA && disxD>disyB){
+            circle->setPos(circle->x()-1,circle->y());
+        }
+        else if (disyA>disxI && disyA>disxD && disyA>disyB){
+            circle->setPos(circle->x()+1,circle->y());
+        }
+        else if (disyB>disxI && disyB>disxD && disyB>disyA){
+            circle->setPos(circle->x()-1,circle->y());
+        }
+
     }
+
     if(moverIx1)
     {
-        circle->setPos(circle->x()-30,circle->y());
+        circle->setPos(circle->x()-5,circle->y());
     }
     if(moverDx1)
     {
-        circle->setPos(circle->x()+30,circle->y());
+        circle->setPos(circle->x()+5,circle->y());
     }
     if(moverUy1)
     {
-        circle->setPos(circle->x(),circle->y()-30);
+        circle->setPos(circle->x(),circle->y()-5);
     }
     if(moverDy1)
     {
-        circle->setPos(circle->x(),circle->y()+30);
+        circle->setPos(circle->x(),circle->y()+5);
     }
     for (QGraphicsRectItem* amarilloItem : galletas){
        if(circle->collidesWithItem(amarilloItem))
