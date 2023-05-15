@@ -47,7 +47,7 @@ private:
     std::vector<QGraphicsRectItem*> paredes;
 
 
-    int puntuacion;
+    int puntuacion=0;
 
     bool moverIx1=false;
     bool moverDx1=false;

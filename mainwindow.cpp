@@ -13,7 +13,7 @@ MainWindow::MainWindow(QWidget *parent)
     connect(timer,SIGNAL(timeout()),this,SLOT(animar()));
     connect(this,SIGNAL(aviso(int)),this,SLOT(aumentarPunt()));
 
-    timer->start(60);
+    timer->start(90);
 
     scene=new QGraphicsScene(0,0,930,840);
     ui->graphicsView->setScene(scene);
@@ -155,19 +155,19 @@ void MainWindow::animar()
 {
     for (QGraphicsRectItem* azulItem : paredes) {
         if (circle->collidesWithItem(azulItem)) {
-            if (circle->y() + circle->rect().height() > azulItem->y() && moverUy1) {
+            if (circle->y() < azulItem->y()) {
                 // La pared está arriba, se evita el movimiento hacia arriba
                 moverUy1 = false;
             }
-            if (circle->y() < azulItem->y() + azulItem->rect().height() && moverDy1) {
+            if (circle->y() > azulItem->y()) {
                 // La pared está abajo, se evita el movimiento hacia abajo
                 moverDy1 = false;
             }
-            if (circle->x() + circle->rect().width() > azulItem->x() && moverIx1) {
+            if (circle->x() > azulItem->x()) {
                 // La pared está a la izquierda, se evita el movimiento hacia la izquierda
                 moverIx1 = false;
             }
-            if (circle->x() < azulItem->x() + azulItem->rect().width() && moverDx1) {
+            if (circle->x() < azulItem->x()) {
                 // La pared está a la derecha, se evita el movimiento hacia la derecha
                 moverDx1 = false;
             }
@@ -194,7 +194,7 @@ void MainWindow::animar()
         {
             if(amarilloItem->isVisible()){
                 amarilloItem->hide();
-                emit aviso(9);
+                emit aviso(10);
                 //delete bola;
             }
 
