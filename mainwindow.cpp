@@ -7,6 +7,9 @@ MainWindow::MainWindow(QWidget *parent)
     , ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
+    QPalette palette = ui->graphicsView->palette();
+    palette.setColor(QPalette::Base, Qt::black);
+    ui->graphicsView->setPalette(palette);
 
     timer=new QTimer();
 
@@ -19,7 +22,6 @@ MainWindow::MainWindow(QWidget *parent)
     ui->graphicsView->setScene(scene);
 
     int i=0;
-    int j=0;
     int tablero[31][28]={};
     for (int j=0;j<28;j++){
         i=0;
@@ -109,7 +111,12 @@ MainWindow::MainWindow(QWidget *parent)
             tablero[i][j]=1;
         }
     }
-    tablero[16][6]=3;
+    for (int j=0;j<28;j++){
+        i=14;
+        tablero[i][j]=1;
+    }
+
+    tablero[13][6]=3;
     int matrizx=840/28;
     int matrizy=930/31;
     for (int i=0;i<31;i++){
@@ -138,7 +145,7 @@ MainWindow::MainWindow(QWidget *parent)
                 int x = j * matrizx;
                 int y = i * matrizy;
                 circle = new QGraphicsEllipseItem(x, y, matrizx-10, matrizy-10);
-                circle->setRect(x, y, matrizx-10, matrizy-10);
+                circle->setRect(x+5, y+5, matrizx-10, matrizy-10);
                 circle->setBrush(Qt::yellow);
                 scene->addItem(circle);
             }
@@ -153,62 +160,46 @@ MainWindow::~MainWindow()
 
 void MainWindow::animar()
 {
-    int disxD=0;
-    int disxI=0;
-    int disyA=0;
-    int disyB=0;
     for (QGraphicsRectItem* azulItem : paredes) {
-        if (circle->collidesWithItem(azulItem) && circle->y() < azulItem->y()) {
-            // La pared está arriba, se evita el movimiento hacia arriba
-            moverUy1 = false;
-            disyA=azulItem->y()-circle->y();
+            if (circle->collidesWithItem(azulItem)) {
+                if ((lastPress == 3)) {
+                    // La pared está arriba, se evita el movimiento hacia arriba
+                    circle->setPos(circle->x(),circle->y()+5);
+                    moverUy1 = false;
+                }
+                if ((lastPress == 4) ) {
+                    // La pared está abajo, se evita el movimiento hacia abajo
+                    circle->setPos(circle->x(),circle->y()-5);
+                    moverDy1 = false;
+                }
+                if ((lastPress== 1)) {
+                    // La pared está a la izquierda, se evita el movimiento hacia la izquierda
+                    circle->setPos(circle->x()+5,circle->y());
+                    moverIx1 = false;
+                }
+                if ((lastPress == 2)) {
+                    // La pared está a la derecha, se evita el movimiento hacia la derecha
+                    circle->setPos(circle->x()-5,circle->y());
+                    moverDx1 = false;
+                }
+            }
         }
-        if (circle->collidesWithItem(azulItem) && circle->y() > azulItem->y()) {
-            // La pared está abajo, se evita el movimiento hacia abajo
-            moverDy1 = false;
-            disyB=circle->y()-azulItem->y();
+        if(moverIx1)
+        {
+            circle->setPos(circle->x()-5,circle->y());
         }
-        else if (circle->collidesWithItem(azulItem) && circle->x() > azulItem->x()) {
-            // La pared está a la izquierda, se evita el movimiento hacia la izquierda
-            moverIx1 = false;
-            disxD=circle->x() - azulItem->x();
+        else if(moverDx1)
+        {
+            circle->setPos(circle->x()+5,circle->y());
         }
-        else if (circle->collidesWithItem(azulItem) && circle->x() < azulItem->x()) {
-            // La pared está a la derecha, se evita el movimiento hacia la derecha
-            moverDx1 = false;
-            disxI=azulItem->x()-circle->x();
+        else if(moverUy1)
+        {
+            circle->setPos(circle->x(),circle->y()-5);
         }
-        if (disxI>disxD && disxI>disyA && disxI>disyB){
-            circle->setPos(circle->x()+1,circle->y());
+        else if(moverDy1)
+        {
+            circle->setPos(circle->x(),circle->y()+5);
         }
-        else if (disxD>disxI && disxD>disyA && disxD>disyB){
-            circle->setPos(circle->x()-1,circle->y());
-        }
-        else if (disyA>disxI && disyA>disxD && disyA>disyB){
-            circle->setPos(circle->x()+1,circle->y());
-        }
-        else if (disyB>disxI && disyB>disxD && disyB>disyA){
-            circle->setPos(circle->x()-1,circle->y());
-        }
-
-    }
-
-    if(moverIx1)
-    {
-        circle->setPos(circle->x()-5,circle->y());
-    }
-    if(moverDx1)
-    {
-        circle->setPos(circle->x()+5,circle->y());
-    }
-    if(moverUy1)
-    {
-        circle->setPos(circle->x(),circle->y()-5);
-    }
-    if(moverDy1)
-    {
-        circle->setPos(circle->x(),circle->y()+5);
-    }
     for (QGraphicsRectItem* amarilloItem : galletas){
        if(circle->collidesWithItem(amarilloItem))
         {
@@ -226,18 +217,22 @@ void MainWindow::keyPressEvent(QKeyEvent *ev)
 {
     if(ev->key()==Qt::Key_A)
     {
+        lastPress=1;
         moverIx1=true;
     }
     else if(ev->key()==Qt::Key_S)
     {
+        lastPress=2;
         moverDx1 = true;
     }
     else if(ev->key()==Qt::Key_W)
     {
+        lastPress=3;
        moverUy1=true;
     }
     else if(ev->key()==Qt::Key_Z)
     {
+        lastPress=4;
         moverDy1=true;
     }
 }

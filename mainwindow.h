@@ -48,6 +48,7 @@ private:
 
 
     int puntuacion=0;
+    int lastPress=0;
 
     bool moverIx1=false;
     bool moverDx1=false;
